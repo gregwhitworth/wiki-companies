@@ -1,5 +1,7 @@
 from lxml import html
+from stop_words import stop_words
 import requests
+import re
 import io
 
 urls = [
@@ -21,24 +23,39 @@ def getCompanies():
         page = requests.get(urls[i])
         tree = html.fromstring(page.content)
         companies += tree.xpath(urlXpath[i])
-        compileOutput(companies, fileName[i])
+        compileOutput(companies, fileName[i], 'true')
+        compileOutput(companies, fileName[i], 'false')
     return companies
 
-def compileOutput(companies, fileName):
+def compileOutput(companies, fileName, removeSw):
     print("Compiling output")
     output = 'companies = ['
 
     for index in range(len(companies)):
         output += '\n"'
-        output += companies[index]
+        if removeSw == 'true':
+            output += removeStopWords(companies[index])
+        else:
+            output += companies[index].lower()
 
         if index != (len(companies) - 1):
             output += '",'
         else:
             output += '"'
     output += "\n]"
+
+    if removeSw == 'true':
+        fileName += '_no_stop_words'
     
     writeCompaniesToFile(output, fileName)
+
+def removeStopWords(word):
+    word = word.lower()
+    for stop_word in stop_words:
+        word = re.sub(r"\b%s\b|\B\.\B" % stop_word, '', word)
+        word = word.replace('  ', ' ')
+        word = word.strip()
+    return word
 
 def writeCompaniesToFile(output, fileName):
     print("Writing companies to file")
@@ -49,7 +66,8 @@ def writeCompaniesToFile(output, fileName):
 
 def main():
     companies = getCompanies()
-    output = compileOutput(companies, 'companies')
+    compileOutput(companies, 'companies', 'false')
+    compileOutput(companies, 'companies', 'true')
 
 if __name__ == '__main__':
     main()
