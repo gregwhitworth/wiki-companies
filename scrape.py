@@ -5,27 +5,35 @@ import re
 import io
 
 urls = [
-    "https://en.m.wikipedia.org/wiki/List_of_S%26P_500_companies"
+    "https://en.m.wikipedia.org/wiki/List_of_S%26P_500_companies",
+    "https://en.m.wikipedia.org/wiki/Dow_Jones_Industrial_Average",
+    "https://en.m.wikipedia.org/wiki/Nikkei_225"
 ]
 
 fileName = [
-    "sp500"
+    "sp500",
+    "dow",
+    "nikei"
 ]
 
 urlXpath = [
-    '//table[@id="constituents"]/tbody/tr/td[position()=1]/a/text()'
+    '//table[@id="constituents"]/tbody/tr/td[position()=1]/a/text()',
+    '//table[@id="constituents"]/tbody/tr/td[position()=1]/a/text()',
+    '//div[contains(@class, "mf-section-3")]/div/ul/li/a[1]/text()'
 ]
 
 def getCompanies():
-    companies = []
     print("Getting companies")
+    allCompanies = []
     for i in range(len(urls)):
+        companies = []
         page = requests.get(urls[i])
         tree = html.fromstring(page.content)
-        companies += tree.xpath(urlXpath[i])
+        companies = tree.xpath(urlXpath[i])
+        allCompanies += companies
         compileOutput(companies, fileName[i], 'true')
         compileOutput(companies, fileName[i], 'false')
-    return companies
+    return allCompanies
 
 def compileOutput(companies, fileName, removeSw):
     print("Compiling output")
@@ -60,12 +68,13 @@ def removeStopWords(word):
 def writeCompaniesToFile(output, fileName):
     print("Writing companies to file")
     tmpFileName = fileName + '_list.py'
-    file = open(tmpFileName, 'w')
+    file = open(tmpFileName, 'w', encoding='utf-8')
     file.write(output)
     return file.close()
 
 def main():
     companies = getCompanies()
+    companies = list(set(companies))
     compileOutput(companies, 'companies', 'false')
     compileOutput(companies, 'companies', 'true')
 
