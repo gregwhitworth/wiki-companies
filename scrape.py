@@ -7,19 +7,22 @@ import io
 urls = [
     "https://en.m.wikipedia.org/wiki/List_of_S%26P_500_companies",
     "https://en.m.wikipedia.org/wiki/Dow_Jones_Industrial_Average",
-    "https://en.m.wikipedia.org/wiki/Nikkei_225"
+    "https://en.m.wikipedia.org/wiki/Nikkei_225",
+    "https://en.m.wikipedia.org/wiki/List_of_largest_Internet_companies"
 ]
 
 fileName = [
     "sp500",
     "dow",
-    "nikei"
+    "nikei",
+    "internet"
 ]
 
 urlXpath = [
     '//table[@id="constituents"]/tbody/tr/td[position()=1]/a/text()',
     '//table[@id="constituents"]/tbody/tr/td[position()=1]/a/text()',
-    '//div[contains(@class, "mf-section-3")]/div/ul/li/a[1]/text()'
+    '//div[contains(@class, "mf-section-3")]/div/ul/li/a[1]/text()',
+    '//div[contains(@class, "mf-section-2")]/table/tbody/tr/td[2]/a/text()'
 ]
 
 def getCompanies():
